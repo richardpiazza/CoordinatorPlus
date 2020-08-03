@@ -111,69 +111,59 @@ public extension AppCoordinator {
     }
     
     func beginTask(_ task: Task, animated: Bool = true, with data: Any? = nil) {
-        if let currentCoordinator = self.currentCoordinator, currentCoordinator.task.isEqual(task) {
-            DispatchQueue.main.async {
+        DispatchQueue.main.async { [unowned self] in
+            if let currentCoordinator = self.currentCoordinator, currentCoordinator.task.isEqual(task) {
                 currentCoordinator.resume()
-            }
-            return
-        } else if let modalCoordinator = self.modalCoordinator, modalCoordinator.task.isEqual(task) {
-            DispatchQueue.main.async {
+                return
+            } else if let modalCoordinator = self.modalCoordinator, modalCoordinator.task.isEqual(task) {
                 modalCoordinator.resume()
+                return
             }
-            return
-        }
-        
-        let nextCoordinator = coordinator(for: task, with: data)
-        
-        defer {
-            if nextCoordinator.isModal {
-                self.modalCoordinator = nextCoordinator
-            } else {
-                self.currentCoordinator = nextCoordinator
+            
+            let nextCoordinator = self.coordinator(for: task, with: data)
+            
+            defer {
+                if nextCoordinator.isModal {
+                    self.modalCoordinator = nextCoordinator
+                } else {
+                    self.currentCoordinator = nextCoordinator
+                }
             }
-        }
-        
-        // Don't stack modals & don't present a non-modal over existing modal
-        if let modalCoordinator = self.modalCoordinator, nextCoordinator.isModal {
-            DispatchQueue.main.async {
+            
+            // Don't stack modals & don't present a non-modal over existing modal
+            if let modalCoordinator = self.modalCoordinator, nextCoordinator.isModal {
                 modalCoordinator.end()
-            }
-            dismiss(taskCoordinator: modalCoordinator, animated: animated) { [unowned self] in
-                nextCoordinator.begin(with: data)
-                self.present(taskCoordinator: nextCoordinator, animated: animated, completion: nil)
-            }
-        } else if let currentCoordinator = self.currentCoordinator, !nextCoordinator.isModal {
-            DispatchQueue.main.async {
+                self.dismiss(taskCoordinator: modalCoordinator, animated: animated) { [unowned self] in
+                    nextCoordinator.begin(with: data)
+                    self.present(taskCoordinator: nextCoordinator, animated: animated, completion: nil)
+                }
+            } else if let currentCoordinator = self.currentCoordinator, !nextCoordinator.isModal {
                 currentCoordinator.end()
-            }
-            dismiss(taskCoordinator: currentCoordinator, animated: animated) { [unowned self] in
-                nextCoordinator.begin(with: data)
-                self.present(taskCoordinator: nextCoordinator, animated: animated, completion: nil)
-            }
-        } else {
-            DispatchQueue.main.async {
+                self.dismiss(taskCoordinator: currentCoordinator, animated: animated) { [unowned self] in
+                    nextCoordinator.begin(with: data)
+                    self.present(taskCoordinator: nextCoordinator, animated: animated, completion: nil)
+                }
+            } else {
                 self.currentCoordinator?.pause()
                 nextCoordinator.begin(with: data)
+                self.present(taskCoordinator: nextCoordinator, animated: animated, completion: nil)
             }
-            present(taskCoordinator: nextCoordinator, animated: animated, completion: nil)
         }
     }
     
     func endTask(_ task: Task) {
-        if let coordinator = self.currentCoordinator, coordinator.task.isEqual(task) {
-            DispatchQueue.main.async {
+        DispatchQueue.main.async {
+            if let coordinator = self.currentCoordinator, coordinator.task.isEqual(task) {
                 coordinator.end()
-            }
-            dismiss(taskCoordinator: coordinator, animated: true, completion: nil)
-            self.currentCoordinator = nil
-        } else if let coordinator = self.modalCoordinator, coordinator.task.isEqual(task) {
-            DispatchQueue.main.async {
+                self.dismiss(taskCoordinator: coordinator, animated: true) {
+                    self.currentCoordinator = nil
+                }
+            } else if let coordinator = self.modalCoordinator, coordinator.task.isEqual(task) {
                 coordinator.end()
-            }
-            dismiss(taskCoordinator: coordinator, animated: true, completion: nil)
-            self.modalCoordinator = nil
-            DispatchQueue.main.async {
-                self.currentCoordinator?.resume()
+                self.dismiss(taskCoordinator: coordinator, animated: true) {
+                    self.modalCoordinator = nil
+                    self.currentCoordinator?.resume()
+                }
             }
         }
     }
@@ -210,29 +200,23 @@ public extension AppCoordinator {
             }
             
             if let completion = completion {
-                DispatchQueue.main.async {
-                    completion()
-                }
+                completion()
             }
         }
     }
     
     func present(taskCoordinator: TaskCoordinator, animated: Bool = true, completion:(() -> Void)? = nil) {
-        guard !taskCoordinator.isModal else {
-            let controller = currentCoordinator?.taskViewController ?? taskViewController
-            DispatchQueue.main.async {
+        DispatchQueue.main.async { [unowned self] in
+            guard !taskCoordinator.isModal else {
+                let controller = currentCoordinator?.taskViewController ?? taskViewController
                 controller.present(taskCoordinator.taskViewController, animated: animated, completion: completion)
-            }
-            if let completion = completion {
-                DispatchQueue.main.async {
+                if let completion = completion {
                     completion()
                 }
+                return
             }
-            return
-        }
-        
-        if animated {
-            DispatchQueue.main.async {
+            
+            if animated {
                 taskCoordinator.taskViewController.view.frame = self.taskViewController.view.frame
                 taskCoordinator.taskViewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
                 taskCoordinator.taskViewController.view.alpha = 0.0
@@ -243,19 +227,15 @@ public extension AppCoordinator {
                     self.taskViewController.addChild(taskCoordinator.taskViewController)
                     taskCoordinator.taskViewController.didMove(toParent: self.taskViewController)
                 }
-            }
-        } else {
-            DispatchQueue.main.async {
+            } else {
                 self.taskViewController.addChild(taskCoordinator.taskViewController)
                 self.taskViewController.view.addSubview(taskCoordinator.taskViewController.view)
                 taskCoordinator.taskViewController.view.frame = self.taskViewController.view.frame
                 taskCoordinator.taskViewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
                 taskCoordinator.taskViewController.didMove(toParent: self.taskViewController)
             }
-        }
-        
-        if let completion = completion {
-            DispatchQueue.main.async {
+            
+            if let completion = completion {
                 completion()
             }
         }
