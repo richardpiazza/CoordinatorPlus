@@ -230,16 +230,27 @@ public extension AppCoordinator {
                 self.taskViewController.view.addSubview(taskCoordinator.taskViewController.view)
                 self.taskViewController.addChild(taskCoordinator.taskViewController)
                 
-                let animator = UIViewPropertyAnimator(duration: 1.0, curve: .linear, animations: {
-                    taskCoordinator.taskViewController.view.alpha = 1.0
-                })
-                animator.addCompletion { (_) in
-                    taskCoordinator.taskViewController.didMove(toParent: self.taskViewController)
-                    DispatchQueue.main.async {
-                        completion?()
+                if #available(iOS 10.0, tvOS 10.0, macCatalyst 13.0, *) {
+                    let animator = UIViewPropertyAnimator(duration: 1.0, curve: .linear, animations: {
+                        taskCoordinator.taskViewController.view.alpha = 1.0
+                    })
+                    animator.addCompletion { (_) in
+                        taskCoordinator.taskViewController.didMove(toParent: self.taskViewController)
+                        DispatchQueue.main.async {
+                            completion?()
+                        }
+                    }
+                    animator.startAnimation()
+                } else {
+                    UIView.animate(withDuration: 1.0, animations: {
+                        taskCoordinator.taskViewController.view.alpha = 1.0
+                    }) { (_) in
+                        taskCoordinator.taskViewController.didMove(toParent: self.taskViewController)
+                        DispatchQueue.main.async {
+                            completion?()
+                        }
                     }
                 }
-                animator.startAnimation()
             }
         } else {
             DispatchQueue.main.async {
