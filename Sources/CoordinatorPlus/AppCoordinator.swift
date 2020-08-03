@@ -202,31 +202,21 @@ public extension AppCoordinator {
     func dismiss(taskCoordinator: TaskCoordinator, animated: Bool = true, completion: (() -> Void)? = nil) {
         DispatchQueue.main.async {
             if taskCoordinator.isModal {
-                self.taskViewController.dismiss(animated: animated, completion: nil)
+                self.taskViewController.dismiss(animated: animated, completion: completion)
             } else {
                 taskCoordinator.taskViewController.willMove(toParent: nil)
                 taskCoordinator.taskViewController.view.removeFromSuperview()
                 taskCoordinator.taskViewController.removeFromParent()
-            }
-            
-            if let completion = completion {
-                DispatchQueue.main.async {
-                    completion()
-                }
+                completion?()
             }
         }
     }
     
     func present(taskCoordinator: TaskCoordinator, animated: Bool = true, completion:(() -> Void)? = nil) {
-        guard !taskCoordinator.isModal else {
+        if taskCoordinator.isModal {
             let controller = currentCoordinator?.taskViewController ?? taskViewController
             DispatchQueue.main.async {
                 controller.present(taskCoordinator.taskViewController, animated: animated, completion: completion)
-            }
-            if let completion = completion {
-                DispatchQueue.main.async {
-                    completion()
-                }
             }
             return
         }
@@ -236,13 +226,20 @@ public extension AppCoordinator {
                 taskCoordinator.taskViewController.view.frame = self.taskViewController.view.frame
                 taskCoordinator.taskViewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
                 taskCoordinator.taskViewController.view.alpha = 0.0
+                
                 self.taskViewController.view.addSubview(taskCoordinator.taskViewController.view)
-                UIView.animate(withDuration: 1.0, animations: {
+                self.taskViewController.addChild(taskCoordinator.taskViewController)
+                
+                let animator = UIViewPropertyAnimator(duration: 1.0, curve: .linear, animations: {
                     taskCoordinator.taskViewController.view.alpha = 1.0
-                }) { [unowned self] (complete) in
-                    self.taskViewController.addChild(taskCoordinator.taskViewController)
+                })
+                animator.addCompletion { (_) in
                     taskCoordinator.taskViewController.didMove(toParent: self.taskViewController)
+                    DispatchQueue.main.async {
+                        completion?()
+                    }
                 }
+                animator.startAnimation()
             }
         } else {
             DispatchQueue.main.async {
@@ -251,12 +248,7 @@ public extension AppCoordinator {
                 taskCoordinator.taskViewController.view.frame = self.taskViewController.view.frame
                 taskCoordinator.taskViewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
                 taskCoordinator.taskViewController.didMove(toParent: self.taskViewController)
-            }
-        }
-        
-        if let completion = completion {
-            DispatchQueue.main.async {
-                completion()
+                completion?()
             }
         }
     }
