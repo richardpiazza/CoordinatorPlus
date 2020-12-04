@@ -3,6 +3,10 @@ import XCTest
 
 class TaskTests: XCTestCase {
     
+    static var allTests = [
+        ("testTaskIsEqual", testTaskIsEqual)
+    ]
+    
     private enum TestTask: Int, Task {
         case alpha
         case beta
