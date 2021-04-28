@@ -56,4 +56,4 @@ _opinionated_.
 ## References
 
 Heavily influenced by [Josh Sullivan's](https://github.com/JoshuaSullivan) [article](http://www.chibicode.org/?p=121) and example project 
-[BeyondViewControllers](https://github.com/JoshuaSullivan).
+[BeyondViewControllers](https://github.com/JoshuaSullivan/CoordinatedMVC).
