@@ -13,7 +13,7 @@ import UIKit
 /// *   No view controller should access information except from its dataSource (View Model).
 ///
 /// *   No view controller should attempt to mutate state outside of itself
-///     except through its delegate (usually a TaskCoordinator).
+///     except through its delegate (usually a `FlowCoordinator`).
 ///
 /// *   No view controller should have knowledge of any other view controller save those
 ///     which it directly parents (embed segue or custom containment).
@@ -21,13 +21,14 @@ import UIKit
 /// *   View Controllers should never access the Service layer directly;
 ///     always mediate access through a delegate and dataSource.
 ///
-/// *   A view controller may be used by any number of TaskCoordinator objects,
+/// *   A view controller may be used by any number of FlowCoordinator objects,
 ///     so long as they are able to fulfill its data and delegation needs.
 ///
-public protocol AppCoordinator: class {
+public protocol AppCoordinator: AnyObject {
     
     #if canImport(UIKit)
     /// Required initializer
+    ///
     /// The initializer of an `AppCoordinator` is responsible for capturing the window
     /// reference, creating any services needed, and beginning an initial `Task`.
     ///
@@ -40,8 +41,8 @@ public protocol AppCoordinator: class {
     /// * This **can not** be an instance of UITabBarController or UINavigationController.
     /// * If you choose to do otherwise, you should implement dismiss()/present() yourself.
     ///
-    /// - parameter window: The UIWindow provided form the UIApplicationDelegate
-    ///
+    /// - parameters:
+    ///   - window: The UIWindow provided form the UIApplicationDelegate
     init(window: UIWindow)
     
     /// A reference to the UIWindow provided from the app delegate
@@ -49,24 +50,26 @@ public protocol AppCoordinator: class {
     #endif
     
     /// The current *non-modal* coordinator handling user interaction
-    var currentCoordinator: TaskCoordinator? { get set }
+    var currentCoordinator: FlowCoordinator? { get set }
     
     /// The current *modal* coordinator handling user interaction
-    var modalCoordinator: TaskCoordinator? { get set }
+    var modalCoordinator: FlowCoordinator? { get set }
     
-    /// Responsible for creating and vending `TaskCoordinator` for the given task.
+    /// Responsible for creating and vending `FlowCoordinator` for the given task.
     ///
-    /// - parameter task: The `Task` to vend a coordinator for.
-    /// - parameter data: Any data to pass to the coordinator.
-    func coordinator(for task: Task, with data: Any?) -> TaskCoordinator
+    /// - parameters:
+    ///   - flow: The `Flow` for which a coordinator should be vended.
+    ///   - data: Any data to pass to the coordinator.
+    func coordinator(for flow: Flow, with data: Any?) -> FlowCoordinator
     
-    /// Returns a task that should begin after the specified task finishes.
+    /// Returns a `Flow` that should begin after the specified `Flow` finishes.
     ///
-    /// - parameter task: The task being finished
-    /// - returns: A new task to begin, or nil.
-    func nextTask(after task: Task) -> Task?
+    /// - parameters:
+    ///   - flow: The flow being finished
+    /// - returns: A new `Flow` to begin, or nil.
+    func nextFlow(after flow: Flow) -> Flow?
     
-    /// Begin or Restart a task
+    /// Begin or Restart a flow
     ///
     /// Logic/Handling:
     /// - initializing a coordinator for the task
@@ -74,10 +77,11 @@ public protocol AppCoordinator: class {
     /// - call dismiss()/present() as needed
     /// - set currentCoordinator/modalCoordinator
     ///
-    /// - parameter task: The Task to begin/restart
-    /// - parameter animated: Indicates wether animation is performed in transition
-    /// - parameter data: Any data to pass to the taskCoordinator being started.
-    func beginTask(_ task: Task, animated: Bool, with data: Any?)
+    /// - parameters:
+    ///   - flow: The `Flow` to begin/restart
+    ///   - animated: Indicates wether animation is performed in transition
+    ///   - data: Any data to pass to the taskCoordinator being started.
+    func beginFlow(_ flow: Flow, animated: Bool, with data: Any?)
     
     /// End a task
     ///
@@ -87,43 +91,46 @@ public protocol AppCoordinator: class {
     /// - call `dismiss(taskCoordinator:)`
     /// - nil currentCoordinator/modalCoordinator
     ///
-    /// - parameter task: The Task to end
-    func endTask(_ task: Task)
+    /// - parameters:
+    ///   - flow: The `Flow` to end
+    func endFlow(_ flow: Flow)
     
-    /// Handles the dismissal/removal of the `TaskCoordinator`s taskViewController.
+    /// Handles the dismissal/removal of the `FlowCoordinator`s taskViewController.
     ///
-    /// - parameter taskCoordinator: The `TaskCoordinator` to dismiss
-    /// - parameter animated: Indicates wether animation is performed in dismissal
-    /// - parameter completion: Handler called upon completion of dismissal
-    func dismiss(taskCoordinator: TaskCoordinator, animated: Bool, completion: (() -> Void)?)
+    /// - parameters:
+    ///   - flowCoordinator: The `FlowCoordinator` to dismiss
+    ///   - animated: Indicates wether animation is performed in dismissal
+    ///   - completion: Handler called upon completion of dismissal
+    func dismiss(flowCoordinator: FlowCoordinator, animated: Bool, completion: (() -> Void)?)
     
-    /// Handles the presentation/adding of the `TaskCoordinator`s taskViewController.
+    /// Handles the presentation/adding of the `FlowCoordinator`s taskViewController.
     ///
-    /// - parameter taskCoordinator: The `TaskCoordinator` to present
-    /// - parameter animated: Indicates wether animation is performed in adding
-    /// - parameter completion: Handler called upon completion of adding
-    func present(taskCoordinator: TaskCoordinator, animated: Bool, completion:(() -> Void)?)
+    /// - parameters:
+    ///   - flowCoordinator: The `FlowCoordinator` to present
+    ///   - animated: Indicates wether animation is performed in adding
+    ///   - completion: Handler called upon completion of adding
+    func present(flowCoordinator: FlowCoordinator, animated: Bool, completion:(() -> Void)?)
 }
 
 public extension AppCoordinator {
-    func nextTask(after task: Task) -> Task? {
+    func nextFlow(after flow: Flow) -> Flow? {
         return nil
     }
     
-    func beginTask(_ task: Task, animated: Bool = true, with data: Any? = nil) {
-        if let currentCoordinator = self.currentCoordinator, currentCoordinator.task.isEqual(task) {
+    func beginFlow(_ flow: Flow, animated: Bool = true, with data: Any? = nil) {
+        if let currentCoordinator = self.currentCoordinator, currentCoordinator.flow.isEqual(flow) {
             DispatchQueue.main.async {
                 currentCoordinator.resume()
             }
             return
-        } else if let modalCoordinator = self.modalCoordinator, modalCoordinator.task.isEqual(task) {
+        } else if let modalCoordinator = self.modalCoordinator, modalCoordinator.flow.isEqual(flow) {
             DispatchQueue.main.async {
                 modalCoordinator.resume()
             }
             return
         }
         
-        let nextCoordinator = coordinator(for: task, with: data)
+        let nextCoordinator = coordinator(for: flow, with: data)
         
         defer {
             if nextCoordinator.isModal {
@@ -138,39 +145,39 @@ public extension AppCoordinator {
             DispatchQueue.main.async {
                 modalCoordinator.end()
             }
-            dismiss(taskCoordinator: modalCoordinator, animated: animated) { [unowned self] in
+            dismiss(flowCoordinator: modalCoordinator, animated: animated) { [unowned self] in
                 nextCoordinator.begin(with: data)
-                self.present(taskCoordinator: nextCoordinator, animated: animated, completion: nil)
+                self.present(flowCoordinator: nextCoordinator, animated: animated, completion: nil)
             }
         } else if let currentCoordinator = self.currentCoordinator, !nextCoordinator.isModal {
             DispatchQueue.main.async {
                 currentCoordinator.end()
             }
-            dismiss(taskCoordinator: currentCoordinator, animated: animated) { [unowned self] in
+            dismiss(flowCoordinator: currentCoordinator, animated: animated) { [unowned self] in
                 nextCoordinator.begin(with: data)
-                self.present(taskCoordinator: nextCoordinator, animated: animated, completion: nil)
+                self.present(flowCoordinator: nextCoordinator, animated: animated, completion: nil)
             }
         } else {
             DispatchQueue.main.async {
                 self.currentCoordinator?.pause()
                 nextCoordinator.begin(with: data)
             }
-            present(taskCoordinator: nextCoordinator, animated: animated, completion: nil)
+            present(flowCoordinator: nextCoordinator, animated: animated, completion: nil)
         }
     }
     
-    func endTask(_ task: Task) {
-        if let coordinator = self.currentCoordinator, coordinator.task.isEqual(task) {
+    func endFlow(_ flow: Flow) {
+        if let coordinator = self.currentCoordinator, coordinator.flow.isEqual(flow) {
             DispatchQueue.main.async {
                 coordinator.end()
             }
-            dismiss(taskCoordinator: coordinator, animated: true, completion: nil)
+            dismiss(flowCoordinator: coordinator, animated: true, completion: nil)
             self.currentCoordinator = nil
-        } else if let coordinator = self.modalCoordinator, coordinator.task.isEqual(task) {
+        } else if let coordinator = self.modalCoordinator, coordinator.flow.isEqual(flow) {
             DispatchQueue.main.async {
                 coordinator.end()
             }
-            dismiss(taskCoordinator: coordinator, animated: true, completion: nil)
+            dismiss(flowCoordinator: coordinator, animated: true, completion: nil)
             self.modalCoordinator = nil
             DispatchQueue.main.async {
                 self.currentCoordinator?.resume()
@@ -179,9 +186,36 @@ public extension AppCoordinator {
     }
 }
 
+public extension AppCoordinator {
+    @available(*, deprecated, renamed: "nextFlow(after:)")
+    func nextTask(after task: Task) -> Task? {
+        nextFlow(after: task)
+    }
+    
+    @available(*, deprecated, renamed: "beginFlow(_:animated:with:)")
+    func beginTask(_ task: Task, animated: Bool = true, with data: Any? = nil) {
+        beginFlow(task, animated: animated, with: data)
+    }
+    
+    @available(*, deprecated, renamed: "endFlow(_:)")
+    func endTask(_ task: Task) {
+        endFlow(task)
+    }
+    
+    @available(*, deprecated, renamed: "dismiss(flowCoordinator:animated:completion:)")
+    func dismiss(taskCoordinator: FlowCoordinator, animated: Bool, completion: (() -> Void)?) {
+        dismiss(flowCoordinator: taskCoordinator, animated: animated, completion: completion)
+    }
+    
+    @available(*, deprecated, renamed: "present(flowCoordinator:animated:completion:)")
+    func present(taskCoordinator: FlowCoordinator, animated: Bool, completion:(() -> Void)?) {
+        present(flowCoordinator: taskCoordinator, animated: animated, completion: completion)
+    }
+}
+
 #if canImport(UIKit)
 public extension AppCoordinator {
-    var taskViewController: UIViewController {
+    var flowViewController: UIViewController {
         if let _ = window.rootViewController as? UITabBarController {
             preconditionFailure("AppCoordinator window.rootViewController must be a UIViewController, not a UITabBarController.")
         }
@@ -199,43 +233,43 @@ public extension AppCoordinator {
         return viewController
     }
     
-    func dismiss(taskCoordinator: TaskCoordinator, animated: Bool = true, completion: (() -> Void)? = nil) {
+    func dismiss(flowCoordinator: FlowCoordinator, animated: Bool = true, completion: (() -> Void)? = nil) {
         DispatchQueue.main.async {
-            if taskCoordinator.isModal {
-                self.taskViewController.dismiss(animated: animated, completion: completion)
+            if flowCoordinator.isModal {
+                self.flowViewController.dismiss(animated: animated, completion: completion)
             } else {
-                taskCoordinator.taskViewController.willMove(toParent: nil)
-                taskCoordinator.taskViewController.view.removeFromSuperview()
-                taskCoordinator.taskViewController.removeFromParent()
+                flowCoordinator.flowViewController.willMove(toParent: nil)
+                flowCoordinator.flowViewController.view.removeFromSuperview()
+                flowCoordinator.flowViewController.removeFromParent()
                 completion?()
             }
         }
     }
     
-    func present(taskCoordinator: TaskCoordinator, animated: Bool = true, completion:(() -> Void)? = nil) {
-        if taskCoordinator.isModal {
-            let controller = currentCoordinator?.taskViewController ?? taskViewController
+    func present(flowCoordinator: FlowCoordinator, animated: Bool = true, completion:(() -> Void)? = nil) {
+        if flowCoordinator.isModal {
+            let controller = currentCoordinator?.flowViewController ?? flowViewController
             DispatchQueue.main.async {
-                controller.present(taskCoordinator.taskViewController, animated: animated, completion: completion)
+                controller.present(flowCoordinator.flowViewController, animated: animated, completion: completion)
             }
             return
         }
         
         if animated {
             DispatchQueue.main.async {
-                taskCoordinator.taskViewController.view.frame = self.taskViewController.view.frame
-                taskCoordinator.taskViewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-                taskCoordinator.taskViewController.view.alpha = 0.0
+                flowCoordinator.flowViewController.view.frame = self.flowViewController.view.frame
+                flowCoordinator.flowViewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                flowCoordinator.flowViewController.view.alpha = 0.0
                 
-                self.taskViewController.view.addSubview(taskCoordinator.taskViewController.view)
-                self.taskViewController.addChild(taskCoordinator.taskViewController)
+                self.flowViewController.view.addSubview(flowCoordinator.flowViewController.view)
+                self.flowViewController.addChild(flowCoordinator.flowViewController)
                 
                 if #available(iOS 10.0, tvOS 10.0, macCatalyst 13.0, *) {
                     let animator = UIViewPropertyAnimator(duration: 1.0, curve: .linear, animations: {
-                        taskCoordinator.taskViewController.view.alpha = 1.0
+                        flowCoordinator.flowViewController.view.alpha = 1.0
                     })
                     animator.addCompletion { (_) in
-                        taskCoordinator.taskViewController.didMove(toParent: self.taskViewController)
+                        flowCoordinator.flowViewController.didMove(toParent: self.flowViewController)
                         DispatchQueue.main.async {
                             completion?()
                         }
@@ -243,9 +277,9 @@ public extension AppCoordinator {
                     animator.startAnimation()
                 } else {
                     UIView.animate(withDuration: 1.0, animations: {
-                        taskCoordinator.taskViewController.view.alpha = 1.0
+                        flowCoordinator.flowViewController.view.alpha = 1.0
                     }) { (_) in
-                        taskCoordinator.taskViewController.didMove(toParent: self.taskViewController)
+                        flowCoordinator.flowViewController.didMove(toParent: self.flowViewController)
                         DispatchQueue.main.async {
                             completion?()
                         }
@@ -254,11 +288,11 @@ public extension AppCoordinator {
             }
         } else {
             DispatchQueue.main.async {
-                self.taskViewController.addChild(taskCoordinator.taskViewController)
-                self.taskViewController.view.addSubview(taskCoordinator.taskViewController.view)
-                taskCoordinator.taskViewController.view.frame = self.taskViewController.view.frame
-                taskCoordinator.taskViewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-                taskCoordinator.taskViewController.didMove(toParent: self.taskViewController)
+                self.flowViewController.addChild(flowCoordinator.flowViewController)
+                self.flowViewController.view.addSubview(flowCoordinator.flowViewController.view)
+                flowCoordinator.flowViewController.view.frame = self.flowViewController.view.frame
+                flowCoordinator.flowViewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                flowCoordinator.flowViewController.didMove(toParent: self.flowViewController)
                 completion?()
             }
         }

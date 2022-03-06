@@ -7,7 +7,7 @@ class TaskTests: XCTestCase {
         ("testTaskIsEqual", testTaskIsEqual)
     ]
     
-    private enum TestTask: Int, Task {
+    private enum TestTask: Int, Flow {
         case alpha
         case beta
         case gamma

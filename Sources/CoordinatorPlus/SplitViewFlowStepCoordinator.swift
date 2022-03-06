@@ -1,17 +1,17 @@
 #if canImport(UIKit)
 import UIKit
 
-/// Extension of `SubtaskCoordinator` that requires a `UISplitViewController` as its `taskViewController`.
-public protocol SplitViewSubtaskCoordinator: SubtaskCoordinator {
+/// Extension of `FlowStepCoordinator` that requires a `UISplitViewController` as its `flowViewController`.
+public protocol SplitViewFlowStepCoordinator: FlowStepCoordinator {
     func masterViewControllerType() -> UIViewController.Type
     func masterViewController(with data: Any?) -> UIViewController
-    func detailViewController(for subtask: Subtask, with data: Any?) -> UIViewController
+    func detailViewController(for flowStep: FlowStep, with data: Any?) -> UIViewController
 }
 
-public extension SplitViewSubtaskCoordinator {
+public extension SplitViewFlowStepCoordinator {
     var splitViewController: UISplitViewController {
-        guard let split = taskViewController as? UISplitViewController else {
-            preconditionFailure("SplitViewSubtaskCoordinator requires 'taskViewController' be a UISplitViewController.")
+        guard let split = flowViewController as? UISplitViewController else {
+            preconditionFailure("SplitViewFlowStepCoordinator requires `flowViewController` be a UISplitViewController.")
         }
         
         return split
@@ -41,23 +41,26 @@ public extension SplitViewSubtaskCoordinator {
         return nav.viewControllers.first
     }
     
-    func viewController(for subtask: Subtask, with data: Any?) -> UIViewController {
-        return detailViewController(for: subtask, with: data)
+    func viewController(for flowStep: FlowStep, with data: Any?) -> UIViewController {
+        return detailViewController(for: flowStep, with: data)
     }
     
     func begin(with data: Any?) {
-        beginSubtask(currentSubtask, with: data)
+        beginFlowStep(currentFlowStep, with: data)
     }
     
-    func beginSubtask(_ subtask: Subtask, animated: Bool = true, with data: Any? = nil) {
-        let viewController = detailViewController(for: subtask, with: data)
+    func beginFlowStep(_ flowStep: FlowStep, animated: Bool = true, with data: Any? = nil) {
+        let viewController = detailViewController(for: flowStep, with: data)
         detailNavigationController?.viewControllers = [viewController]
         
-        self.currentSubtask = subtask
+        self.currentFlowStep = flowStep
     }
     
-    func endSubtask(_ subtask: Subtask, animated: Bool) {
+    func endFlowStep(_ flowStep: FlowStep, animated: Bool) {
         
     }
 }
+
+@available(*, deprecated, renamed: "SplitViewFlowStepCoordinator")
+public typealias SplitViewSubtaskCoordinator = SplitViewFlowStepCoordinator
 #endif

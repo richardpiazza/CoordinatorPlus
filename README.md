@@ -19,7 +19,7 @@ as a dependency within your `Package.swift` manifest:
 let package = Package(
     ...
     dependencies: [
-        .package(url: "https://github.com/richardpiazza/CoordinatorPlus.git", from: "0.1.0")
+        .package(url: "https://github.com/richardpiazza/CoordinatorPlus.git", from: "0.3.0")
     ],
     ...
 )
@@ -45,9 +45,9 @@ the framework.
 
 The primary classes to note are:
 * `AppCoordinator`
-* `Task`
-* `TaskCoordinator`
-* `TaskCoordinatorDelegate`
+* `Flow`
+* `FlowCoordinator`
+* `FlowCoordinatorDelegate`
 
 All of the other files fall outside of what someone could consider a _standard_ Coordinated MVC architectural pattern. The purpose of these 
 files is to provide default/sample implementations for specific use cases when used on a `UIKit` platform. This implement is rather 
