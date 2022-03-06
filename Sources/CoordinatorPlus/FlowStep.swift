@@ -14,6 +14,3 @@ public protocol FlowStep: Flow {
     var viewControllerType: UIViewController.Type { get }
     #endif
 }
-
-@available(*, deprecated, renamed: "FlowStep")
-public typealias Subtask = FlowStep

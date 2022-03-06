@@ -186,33 +186,6 @@ public extension AppCoordinator {
     }
 }
 
-public extension AppCoordinator {
-    @available(*, deprecated, renamed: "nextFlow(after:)")
-    func nextTask(after task: Task) -> Task? {
-        nextFlow(after: task)
-    }
-    
-    @available(*, deprecated, renamed: "beginFlow(_:animated:with:)")
-    func beginTask(_ task: Task, animated: Bool = true, with data: Any? = nil) {
-        beginFlow(task, animated: animated, with: data)
-    }
-    
-    @available(*, deprecated, renamed: "endFlow(_:)")
-    func endTask(_ task: Task) {
-        endFlow(task)
-    }
-    
-    @available(*, deprecated, renamed: "dismiss(flowCoordinator:animated:completion:)")
-    func dismiss(taskCoordinator: FlowCoordinator, animated: Bool, completion: (() -> Void)?) {
-        dismiss(flowCoordinator: taskCoordinator, animated: animated, completion: completion)
-    }
-    
-    @available(*, deprecated, renamed: "present(flowCoordinator:animated:completion:)")
-    func present(taskCoordinator: FlowCoordinator, animated: Bool, completion:(() -> Void)?) {
-        present(flowCoordinator: taskCoordinator, animated: animated, completion: completion)
-    }
-}
-
 #if canImport(UIKit)
 public extension AppCoordinator {
     var flowViewController: UIViewController {
