@@ -1,7 +1,7 @@
 #if canImport(UIKit)
 import UIKit
 
-/// Extension of `SubtaskCoordinator` that requires a `UISplitViewController` as its `taskViewController`.
+/// Extension of `FlowStepCoordinator` that requires a `UISplitViewController` as its `flowViewController`.
 public protocol SplitViewFlowStepCoordinator: FlowStepCoordinator {
     func masterViewControllerType() -> UIViewController.Type
     func masterViewController(with data: Any?) -> UIViewController
@@ -11,7 +11,7 @@ public protocol SplitViewFlowStepCoordinator: FlowStepCoordinator {
 public extension SplitViewFlowStepCoordinator {
     var splitViewController: UISplitViewController {
         guard let split = flowViewController as? UISplitViewController else {
-            preconditionFailure("SplitViewSubtaskCoordinator requires 'taskViewController' be a UISplitViewController.")
+            preconditionFailure("SplitViewFlowStepCoordinator requires `flowViewController` be a UISplitViewController.")
         }
         
         return split

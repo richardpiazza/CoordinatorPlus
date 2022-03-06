@@ -1,25 +1,26 @@
 import Foundation
 
-/// Receives notifications that a `TaskCoordinator` has completed or that a
-/// different `TaskCoordinator` is needed to continue the user's flow through the app.
+/// Receives notifications that a `FlowCoordinator` has completed or that a
+/// different `FlowCoordinator` is needed to continue the user's flow through the app.
 ///
-/// - note: An `AppCoordinator` will most likely be a `TaskCoordinatorDelegate`. The
+/// - note: An `AppCoordinator` will most likely be a `FlowCoordinatorDelegate`. The
 ///         extension provides a default implementation hooking into the end() and
 ///         begin() methods of the `AppCoordinator`.
 ///
 public protocol FlowCoordinatorDelegate: AnyObject {
     
-    /// The task coordinator concluded successfully.
+    /// The flow coordinator concluded successfully.
     func flowCoordinator(_ flowCoordinator: FlowCoordinator, ended flow: Flow)
     
-    /// The task coordinator was canceled (used by modal coordinators)
+    /// The flow coordinator was canceled (used by modal coordinators)
     func flowCoordinator(_ flowCoordinator: FlowCoordinator, canceled flow: Flow)
     
-    /// The task coordinator is reaching out for another coordinator to continue coordination duties.
+    /// The flow coordinator is reaching out for another coordinator to continue coordination duties.
     ///
-    /// - Parameter taskCoordinator: The `TaskCoordinator` reaching out for assistance.
-    /// - Parameter changeTask: The `Task` that is required to continue the user flow.
-    /// - Parameter data: Any data that should be passed to the next Task Coordinator
+    /// - parameters:
+    ///   - flowCoordinator: The `FlowCoordinator` reaching out for assistance.
+    ///   - begin: The `Flow` that is required to continue the user flow.
+    ///   - data: Any data that should be passed to the next Task Coordinator
     func flowCoordinator(_ flowCoordinator: FlowCoordinator, begin flow: Flow, with data: Any?)
 }
 

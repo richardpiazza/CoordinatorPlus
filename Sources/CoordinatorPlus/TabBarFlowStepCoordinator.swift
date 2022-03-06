@@ -1,11 +1,11 @@
 #if canImport(UIKit)
 import UIKit
 
-/// Extension of `SubtaskCoordinator` that requires a `UITabBarController` as its `taskViewController`.
+/// Extension of `FlowStepCoordinator` that requires a `UITabBarController` as its `flowViewController`.
 ///
 /// A basic implementation of beginSubtask() is provided to add and select the
-/// correct UIViewController for a given `Subtask`. The default implementation does
-/// not allow for a `Subtask` to be ended, i.e. removed from the TabBar.
+/// correct UIViewController for a given `FlowStep`. The default implementation does
+/// not allow for a `FlowStep` to be ended, i.e. removed from the TabBar.
 ///
 /// To fully track the `currentSubtask` state, the UITabBarControllerDelegate should
 /// be implemented. An example is:
@@ -14,10 +14,10 @@ import UIKit
 /// // MARK: - UITabBarControllerDelegate
 /// extension TabbedCoordinator: UITabBarControllerDelegate {
 ///     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-///         var subtaskViewController: SubtaskViewController?
-///         if let typedViewController = viewController as? SubtaskViewController {
+///         var subtaskViewController: FlowStepViewController?
+///         if let typedViewController = viewController as? FlowStepViewController {
 ///             subtaskViewController = typedViewController
-///         } else if let navigationController = viewController as? UINavigationController, let typedViewController = navigationController.viewControllers.first as? SubtaskViewController {
+///         } else if let navigationController = viewController as? UINavigationController, let typedViewController = navigationController.viewControllers.first as? FlowStepViewController {
 ///             subtaskViewController = typedViewController
 ///         }
 ///
@@ -37,7 +37,7 @@ public protocol TabBarFlowStepCoordinator: FlowStepCoordinator {
 public extension TabBarFlowStepCoordinator {
     var tabBarController: UITabBarController {
         guard let tab = flowViewController as? UITabBarController else {
-            preconditionFailure("TabBarSubtaskCoordinator requires 'taskViewController' be a UITabBarController.")
+            preconditionFailure("TabBarFlowStepCoordinator requires `flowViewController` be a UITabBarController.")
         }
         
         return tab

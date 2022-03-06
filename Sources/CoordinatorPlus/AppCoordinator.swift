@@ -13,7 +13,7 @@ import UIKit
 /// *   No view controller should access information except from its dataSource (View Model).
 ///
 /// *   No view controller should attempt to mutate state outside of itself
-///     except through its delegate (usually a TaskCoordinator).
+///     except through its delegate (usually a `FlowCoordinator`).
 ///
 /// *   No view controller should have knowledge of any other view controller save those
 ///     which it directly parents (embed segue or custom containment).
@@ -21,13 +21,14 @@ import UIKit
 /// *   View Controllers should never access the Service layer directly;
 ///     always mediate access through a delegate and dataSource.
 ///
-/// *   A view controller may be used by any number of TaskCoordinator objects,
+/// *   A view controller may be used by any number of FlowCoordinator objects,
 ///     so long as they are able to fulfill its data and delegation needs.
 ///
 public protocol AppCoordinator: AnyObject {
     
     #if canImport(UIKit)
     /// Required initializer
+    ///
     /// The initializer of an `AppCoordinator` is responsible for capturing the window
     /// reference, creating any services needed, and beginning an initial `Task`.
     ///
@@ -40,8 +41,8 @@ public protocol AppCoordinator: AnyObject {
     /// * This **can not** be an instance of UITabBarController or UINavigationController.
     /// * If you choose to do otherwise, you should implement dismiss()/present() yourself.
     ///
-    /// - parameter window: The UIWindow provided form the UIApplicationDelegate
-    ///
+    /// - parameters:
+    ///   - window: The UIWindow provided form the UIApplicationDelegate
     init(window: UIWindow)
     
     /// A reference to the UIWindow provided from the app delegate
@@ -56,17 +57,19 @@ public protocol AppCoordinator: AnyObject {
     
     /// Responsible for creating and vending `FlowCoordinator` for the given task.
     ///
-    /// - parameter flow: The `Flow` for which a coordinator should be vended.
-    /// - parameter data: Any data to pass to the coordinator.
+    /// - parameters:
+    ///   - flow: The `Flow` for which a coordinator should be vended.
+    ///   - data: Any data to pass to the coordinator.
     func coordinator(for flow: Flow, with data: Any?) -> FlowCoordinator
     
     /// Returns a `Flow` that should begin after the specified `Flow` finishes.
     ///
-    /// - parameter flow: The flow being finished
+    /// - parameters:
+    ///   - flow: The flow being finished
     /// - returns: A new `Flow` to begin, or nil.
     func nextFlow(after flow: Flow) -> Flow?
     
-    /// Begin or Restart a task
+    /// Begin or Restart a flow
     ///
     /// Logic/Handling:
     /// - initializing a coordinator for the task
@@ -74,9 +77,10 @@ public protocol AppCoordinator: AnyObject {
     /// - call dismiss()/present() as needed
     /// - set currentCoordinator/modalCoordinator
     ///
-    /// - parameter flow: The `Flow` to begin/restart
-    /// - parameter animated: Indicates wether animation is performed in transition
-    /// - parameter data: Any data to pass to the taskCoordinator being started.
+    /// - parameters:
+    ///   - flow: The `Flow` to begin/restart
+    ///   - animated: Indicates wether animation is performed in transition
+    ///   - data: Any data to pass to the taskCoordinator being started.
     func beginFlow(_ flow: Flow, animated: Bool, with data: Any?)
     
     /// End a task
@@ -87,21 +91,24 @@ public protocol AppCoordinator: AnyObject {
     /// - call `dismiss(taskCoordinator:)`
     /// - nil currentCoordinator/modalCoordinator
     ///
-    /// - parameter flow: The `Flow` to end
+    /// - parameters:
+    ///   - flow: The `Flow` to end
     func endFlow(_ flow: Flow)
     
-    /// Handles the dismissal/removal of the `TaskCoordinator`s taskViewController.
+    /// Handles the dismissal/removal of the `FlowCoordinator`s taskViewController.
     ///
-    /// - parameter taskCoordinator: The `TaskCoordinator` to dismiss
-    /// - parameter animated: Indicates wether animation is performed in dismissal
-    /// - parameter completion: Handler called upon completion of dismissal
+    /// - parameters:
+    ///   - flowCoordinator: The `FlowCoordinator` to dismiss
+    ///   - animated: Indicates wether animation is performed in dismissal
+    ///   - completion: Handler called upon completion of dismissal
     func dismiss(flowCoordinator: FlowCoordinator, animated: Bool, completion: (() -> Void)?)
     
-    /// Handles the presentation/adding of the `TaskCoordinator`s taskViewController.
+    /// Handles the presentation/adding of the `FlowCoordinator`s taskViewController.
     ///
-    /// - parameter taskCoordinator: The `TaskCoordinator` to present
-    /// - parameter animated: Indicates wether animation is performed in adding
-    /// - parameter completion: Handler called upon completion of adding
+    /// - parameters:
+    ///   - flowCoordinator: The `FlowCoordinator` to present
+    ///   - animated: Indicates wether animation is performed in adding
+    ///   - completion: Handler called upon completion of adding
     func present(flowCoordinator: FlowCoordinator, animated: Bool, completion:(() -> Void)?)
 }
 

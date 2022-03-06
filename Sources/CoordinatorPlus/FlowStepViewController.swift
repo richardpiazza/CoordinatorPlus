@@ -1,8 +1,8 @@
 import Foundation
 
-/// Protocol implemented by `UIViewController` subclasses being managed and displayed by a `SubtaskCoordinator`.
+/// Protocol implemented by `UIViewController` subclasses being managed and displayed by a `FlowStepCoordinator`.
 public protocol FlowStepViewController {
-    /// The `Subtask` the `UIViewController` manages.
+    /// The `FlowStep` the `UIViewController` manages.
     var flowStep: FlowStep { get }
     
     /// The coordinator managing this view controller.

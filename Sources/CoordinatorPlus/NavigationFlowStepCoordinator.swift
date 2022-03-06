@@ -1,18 +1,18 @@
 #if canImport(UIKit)
 import UIKit
 
-/// Extension of `SubtaskCoordinator` that requires a `UINavigationController` as its `taskViewController`.
+/// Extension of `FlowStepCoordinator` that requires a `UINavigationController` as its `flowViewController`.
 ///
-/// To fully track the `currentSubtask` the coordinator is displaying,
-/// A `NavigationSubtaskCoordinator` should implement the `UINavigationControllerDelegate`
+/// To fully track the `currentFlowStep` the coordinator is displaying,
+/// A `NavigationFlowStepCoordinator` should implement the `UINavigationControllerDelegate`
 /// to track which task is visible. An implementation would look like:
 ///
 /// ```swift
 /// // MARK: - UINavigationControllerDelegate
 /// extension LoginCoordinator: UINavigationControllerDelegate {
 ///     func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
-///         if let subtaskViewController = viewController as? SubtaskViewController {
-///             self.currentSubtask = subtaskViewController.subtask
+///         if let flowStepViewController = viewController as? FlowStepViewController {
+///             self.currentFlowStep = flowStepViewController.flowStep
 ///         }
 ///     }
 /// }
@@ -24,7 +24,7 @@ public protocol NavigationFlowStepCoordinator: FlowStepCoordinator {
 public extension NavigationFlowStepCoordinator {
     var navigationController: UINavigationController {
         guard let nav = flowViewController as? UINavigationController else {
-            preconditionFailure("NavigationSubtaskCoordinator requires 'taskViewController' be a UINavigationController.")
+            preconditionFailure("NavigationFlowStepCoordinator requires `flowViewController` be a UINavigationController.")
         }
         
         return nav

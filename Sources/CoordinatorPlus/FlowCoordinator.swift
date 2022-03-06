@@ -5,16 +5,16 @@ import UIKit
 
 /// An object that manages a single `Flow`.
 ///
-/// The `taskViewController` of a `FlowCoordinator` can be any `UIViewController` subclass.
+/// The `flowViewController` of a `FlowCoordinator` can be any `UIViewController` subclass.
 /// But there are specialized protocol extensions that are provided for other UIViewController types.
 ///
-/// *   **NavigationSubtaskCoordinator**: requires a `UINavigationController` as it's
-///     root and pushes/pops views for `Subtask`s.
+/// *   **NavigationFlowStepCoordinator**: requires a `UINavigationController` as it's
+///     root and pushes/pops views for `FlowStep`s.
 ///
-/// *   **TabBarSubtaskCoordinator**: Manages adding UIViewControllers for specific
-///     `Subtask`s on to a UITabBarController.
+/// *   **TabBarFlowStepCoordinator**: Manages adding UIViewControllers for specific
+///     `FlowStep`s on to a UITabBarController.
 ///
-/// *   **SplitViewSubtaskCoordinator**: Handles the interaction of `Subtask`s in
+/// *   **SplitViewFlowStepCoordinator**: Handles the interaction of `FlowStep`s in
 ///     the context of a UISplitViewController.
 ///
 public protocol FlowCoordinator: AnyObject {
@@ -76,8 +76,10 @@ public extension FlowCoordinator {
 public typealias TaskCoordinator = FlowCoordinator
 
 public extension FlowCoordinator {
+    #if canImport(UIKit)
     @available(*, deprecated, renamed: "flowViewController")
     var taskViewController: UIViewController { flowViewController }
+    #endif
     
     @available(*, deprecated, renamed: "flow")
     var task: Flow { flow }

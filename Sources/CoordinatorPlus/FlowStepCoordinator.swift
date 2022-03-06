@@ -3,45 +3,50 @@ import Foundation
 import UIKit
 #endif
 
-/// An extension of `TaskCoordinator` designed for handling multi-view tasks.
+/// An extension of `FlowCoordinator` designed for handling multi-view tasks.
 ///
 /// For instance: A 'Login' workflow that might have a login view,
 /// registration view, and password reset view.
 ///
-/// `UIViewController` subclasses being managed by a `SubtaskCoordinator` should
-/// implement the `SubtaskViewController` protocol. This allows the coordinator
-/// to track the `currentSubtask` during begin() and end() calls.
+/// `UIViewController` subclasses being managed by a `FlowStepCoordinator` should
+/// implement the `FlowStepViewController` protocol. This allows the coordinator
+/// to track the `currentFlowStep` during begin() and end() calls.
 ///
 public protocol FlowStepCoordinator: FlowCoordinator {
-    /// The `Subtask` that this coordinator is currently displaying.
+    /// The `FlowStep` that this coordinator is currently displaying.
     var currentFlowStep: FlowStep { get set }
     
     #if canImport(UIKit)
-    /// Initializes the `UIViewController` for the `Subtask`.
+    /// Initializes the `UIViewController` for the `FlowStep`.
+    ///
     /// Assign any DataSource/Delegates.
     ///
-    /// - parameter subtask: The `Subtask`
-    /// - parameter data: Any data that should be passed to the `UIViewController` instance.
-    /// - returns: An initialized `UIViewController` for the specified `Subtask`.
+    /// - parameters:
+    ///   - flowStep: The `FlowStep`
+    ///   - data: Any data that should be passed to the `UIViewController` instance.
+    /// - returns: An initialized `UIViewController` for the specified `FlowStep`.
     func viewController(for flowStep: FlowStep, with data: Any?) -> UIViewController
     #endif
     
-    /// Begin displaying the specific `Subtask`.
+    /// Begin displaying the specific `FlowStep`.
+    ///
     /// The default implementation pushes `UIViewController`s onto the navigation
-    /// stack. If a request to begin a `Subtask` associated with the
+    /// stack. If a request to begin a `FlowStep` associated with the
     /// `rootViewControllerType` is called, the stack will pop to the root.
     ///
-    /// - parameter subtask: The specific `Subtask`
-    /// - parameter animated: Indicates wether animation is to be performed.
-    /// - parameter data: Data that should be passed on to an initialized view controller.
+    /// - parameters:
+    ///   - flowStep: The specific `FlowStep`
+    ///   - animated: Indicates wether animation is to be performed.
+    ///   - data: Data that should be passed on to an initialized view controller.
     func beginFlowStep(_ flowStep: FlowStep, animated: Bool, with data: Any?)
     
-    /// Ends the requested `Subtask`. The default implementation will
-    /// locate the `UIViewController` for the task and remove it from the stack.
+    /// Ends the requested `FlowStep`. The default implementation will locate the `UIViewController` for the task and remove it from the stack.
+    ///
     /// If it's the current UIViewController, a pop is performed.
     ///
-    /// - parameter subtask: The `Subtask` to end.
-    /// - parameter animated: Indicates wether animation is to be performed.
+    /// - parameters:
+    ///   - flowStep: The `FlowStep` to end.
+    ///   - animated: Indicates wether animation is to be performed.
     func endFlowStep(_ flowStep: FlowStep, animated: Bool)
 }
 
@@ -55,7 +60,7 @@ public extension FlowStepCoordinator {
         set { currentFlowStep = newValue }
     }
     
-    @available(*, deprecated, renamed: "beginFlowStep(_:animated:data:)")
+    @available(*, deprecated, renamed: "beginFlowStep(_:animated:with:)")
     func beginSubtask(_ subtask: FlowStep, animated: Bool, with data: Any?) {
         beginFlowStep(subtask, animated: animated, with: data)
     }
