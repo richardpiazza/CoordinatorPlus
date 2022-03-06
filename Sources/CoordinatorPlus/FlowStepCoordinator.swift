@@ -12,9 +12,9 @@ import UIKit
 /// implement the `SubtaskViewController` protocol. This allows the coordinator
 /// to track the `currentSubtask` during begin() and end() calls.
 ///
-public protocol SubtaskCoordinator: TaskCoordinator {
+public protocol FlowStepCoordinator: FlowCoordinator {
     /// The `Subtask` that this coordinator is currently displaying.
-    var currentSubtask: Subtask { get set }
+    var currentFlowStep: FlowStep { get set }
     
     #if canImport(UIKit)
     /// Initializes the `UIViewController` for the `Subtask`.
@@ -23,7 +23,7 @@ public protocol SubtaskCoordinator: TaskCoordinator {
     /// - parameter subtask: The `Subtask`
     /// - parameter data: Any data that should be passed to the `UIViewController` instance.
     /// - returns: An initialized `UIViewController` for the specified `Subtask`.
-    func viewController(for subtask: Subtask, with data: Any?) -> UIViewController
+    func viewController(for flowStep: FlowStep, with data: Any?) -> UIViewController
     #endif
     
     /// Begin displaying the specific `Subtask`.
@@ -34,7 +34,7 @@ public protocol SubtaskCoordinator: TaskCoordinator {
     /// - parameter subtask: The specific `Subtask`
     /// - parameter animated: Indicates wether animation is to be performed.
     /// - parameter data: Data that should be passed on to an initialized view controller.
-    func beginSubtask(_ subtask: Subtask, animated: Bool, with data: Any?)
+    func beginFlowStep(_ flowStep: FlowStep, animated: Bool, with data: Any?)
     
     /// Ends the requested `Subtask`. The default implementation will
     /// locate the `UIViewController` for the task and remove it from the stack.
@@ -42,5 +42,26 @@ public protocol SubtaskCoordinator: TaskCoordinator {
     ///
     /// - parameter subtask: The `Subtask` to end.
     /// - parameter animated: Indicates wether animation is to be performed.
-    func endSubtask(_ subtask: Subtask, animated: Bool)
+    func endFlowStep(_ flowStep: FlowStep, animated: Bool)
+}
+
+@available(*, deprecated, renamed: "FlowStepCoordinator")
+public typealias SubtaskCoordinator = FlowStepCoordinator
+
+public extension FlowStepCoordinator {
+    @available(*, deprecated, renamed: "currentFlowStep")
+    var currentSubtask: FlowStep {
+        get { currentFlowStep }
+        set { currentFlowStep = newValue }
+    }
+    
+    @available(*, deprecated, renamed: "beginFlowStep(_:animated:data:)")
+    func beginSubtask(_ subtask: FlowStep, animated: Bool, with data: Any?) {
+        beginFlowStep(subtask, animated: animated, with: data)
+    }
+    
+    @available(*, deprecated, renamed: "endFlowStep(_:animated:)")
+    func endSubtask(_ subtask: FlowStep, animated: Bool) {
+        endFlowStep(subtask, animated: animated)
+    }
 }

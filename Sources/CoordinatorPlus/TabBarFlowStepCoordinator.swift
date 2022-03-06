@@ -30,13 +30,13 @@ import UIKit
 /// }
 /// ```
 ///
-public protocol TabBarSubtaskCoordinator: SubtaskCoordinator {
+public protocol TabBarFlowStepCoordinator: FlowStepCoordinator {
     
 }
 
-public extension TabBarSubtaskCoordinator {
+public extension TabBarFlowStepCoordinator {
     var tabBarController: UITabBarController {
-        guard let tab = taskViewController as? UITabBarController else {
+        guard let tab = flowViewController as? UITabBarController else {
             preconditionFailure("TabBarSubtaskCoordinator requires 'taskViewController' be a UITabBarController.")
         }
         
@@ -44,21 +44,21 @@ public extension TabBarSubtaskCoordinator {
     }
     
     func begin(with data: Any?) {
-        beginSubtask(currentSubtask, with: data)
+        beginFlowStep(currentFlowStep, with: data)
         let viewControllers = tabBarController.viewControllers ?? []
         
         guard viewControllers.count > 0 else {
-            let viewController = self.viewController(for: currentSubtask, with: data)
+            let viewController = self.viewController(for: currentFlowStep, with: data)
             tabBarController.viewControllers = [viewController]
             return
         }
         
         viewControllers.forEach { (viewController) in
-            guard let subtaskViewController = viewController as? SubtaskViewController else {
+            guard let subtaskViewController = viewController as? FlowStepViewController else {
                 return
             }
             
-            guard subtaskViewController.subtask.isEqual(currentSubtask) else {
+            guard subtaskViewController.flowStep.isEqual(currentFlowStep) else {
                 return
             }
             
@@ -66,33 +66,36 @@ public extension TabBarSubtaskCoordinator {
         }
     }
     
-    func beginSubtask(_ subtask: Subtask, animated: Bool = true, with data: Any?) {
-        let vcType = subtask.viewControllerType
+    func beginFlowStep(_ flowStep: FlowStep, animated: Bool = true, with data: Any?) {
+        let vcType = flowStep.viewControllerType
         
         var viewControllers = tabBarController.viewControllers ?? []
         for viewController in viewControllers {
             if type(of: viewController) == vcType {
                 self.tabBarController.selectedViewController = viewController
-                self.currentSubtask = subtask
+                self.currentFlowStep = flowStep
                 return
             } else if let nav = viewController as? UINavigationController, let root = nav.viewControllers.first, type(of: root) == vcType {
                 self.tabBarController.selectedViewController = viewController
-                self.currentSubtask = subtask
+                self.currentFlowStep = flowStep
                 return
             }
         }
         
-        let viewController = self.viewController(for: subtask, with: data)
+        let viewController = self.viewController(for: flowStep, with: data)
         viewControllers.append(viewController)
         
         self.tabBarController.setViewControllers(viewControllers, animated: true)
         self.tabBarController.selectedViewController = viewController
         
-        self.currentSubtask = subtask
+        self.currentFlowStep = flowStep
     }
     
-    func endSubtask(_ subtask: Subtask, animated: Bool) {
+    func endFlowStep(_ flowStep: FlowStep, animated: Bool) {
         
     }
 }
+
+@available(*, deprecated, renamed: "TabBarFlowStepCoordinator")
+public typealias TabBarSubtaskCoordinator = TabBarFlowStepCoordinator
 #endif

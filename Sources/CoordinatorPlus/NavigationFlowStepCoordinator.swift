@@ -18,12 +18,12 @@ import UIKit
 /// }
 /// ```
 ///
-public protocol NavigationSubtaskCoordinator: SubtaskCoordinator {
+public protocol NavigationFlowStepCoordinator: FlowStepCoordinator {
 }
 
-public extension NavigationSubtaskCoordinator {
+public extension NavigationFlowStepCoordinator {
     var navigationController: UINavigationController {
-        guard let nav = taskViewController as? UINavigationController else {
+        guard let nav = flowViewController as? UINavigationController else {
             preconditionFailure("NavigationSubtaskCoordinator requires 'taskViewController' be a UINavigationController.")
         }
         
@@ -31,23 +31,23 @@ public extension NavigationSubtaskCoordinator {
     }
     
     func begin(with data: Any?) {
-        beginSubtask(currentSubtask, with: data)
+        beginFlowStep(currentFlowStep, with: data)
     }
     
-    func beginSubtask(_ subtask: Subtask, animated: Bool = true, with data: Any? = nil) {
-        let vcType = subtask.viewControllerType
+    func beginFlowStep(_ flowStep: FlowStep, animated: Bool = true, with data: Any? = nil) {
+        let vcType = flowStep.viewControllerType
         
         let viewControllers = navigationController.viewControllers
         let types = viewControllers.map({ return type(of: $0) })
         if let index = types.firstIndex(where: { $0 == vcType }) {
             let viewController = viewControllers[index]
             navigationController.popToViewController(viewController, animated: true)
-            self.currentSubtask = subtask
+            self.currentFlowStep = flowStep
             
             return
         }
         
-        let vc = viewController(for: subtask, with: data)
+        let vc = viewController(for: flowStep, with: data)
         
         if viewControllers.count == 0 {
             navigationController.viewControllers = [vc]
@@ -55,11 +55,11 @@ public extension NavigationSubtaskCoordinator {
             navigationController.pushViewController(vc, animated: animated)
         }
         
-        self.currentSubtask = subtask
+        self.currentFlowStep = flowStep
     }
     
-    func endSubtask(_ subtask: Subtask, animated: Bool = true) {
-        let vcType = subtask.viewControllerType
+    func endFlowStep(_ flowStep: FlowStep, animated: Bool = true) {
+        let vcType = flowStep.viewControllerType
         
         let viewControllers = navigationController.viewControllers
         let types = viewControllers.map({ return type(of: $0)})
@@ -70,8 +70,8 @@ public extension NavigationSubtaskCoordinator {
         
         if index == (types.count - 1) {
             navigationController.popViewController(animated: animated)
-            if let subtaskViewController = viewControllers[index - 1] as? SubtaskViewController {
-                self.currentSubtask = subtaskViewController.subtask
+            if let subtaskViewController = viewControllers[index - 1] as? FlowStepViewController {
+                self.currentFlowStep = subtaskViewController.flowStep
             }
             return
         }
@@ -79,4 +79,7 @@ public extension NavigationSubtaskCoordinator {
         navigationController.viewControllers.remove(at: index)
     }
 }
+
+@available(*, deprecated, renamed: "NavigationFlowStepCoordinator")
+public typealias NavigationSubtaskCoordinator = NavigationFlowStepCoordinator
 #endif
