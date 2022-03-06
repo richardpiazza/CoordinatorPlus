@@ -79,7 +79,4 @@ public extension NavigationFlowStepCoordinator {
         navigationController.viewControllers.remove(at: index)
     }
 }
-
-@available(*, deprecated, renamed: "NavigationFlowStepCoordinator")
-public typealias NavigationSubtaskCoordinator = NavigationFlowStepCoordinator
 #endif

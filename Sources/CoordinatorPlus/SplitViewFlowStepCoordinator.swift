@@ -60,7 +60,4 @@ public extension SplitViewFlowStepCoordinator {
         
     }
 }
-
-@available(*, deprecated, renamed: "SplitViewFlowStepCoordinator")
-public typealias SplitViewSubtaskCoordinator = SplitViewFlowStepCoordinator
 #endif

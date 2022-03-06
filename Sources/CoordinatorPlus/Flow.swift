@@ -30,6 +30,3 @@ public extension Flow where Self: RawRepresentable, Self.RawValue: Equatable {
         return self.rawValue == typed.rawValue
     }
 }
-
-@available(*, deprecated, renamed: "Flow", message: "Avoid namespace collisions with Swift Concurrency 'Task'.")
-public typealias Task = Flow

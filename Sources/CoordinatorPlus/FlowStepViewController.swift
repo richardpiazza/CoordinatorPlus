@@ -8,17 +8,3 @@ public protocol FlowStepViewController {
     /// The coordinator managing this view controller.
     var flowStepCoordinator: FlowStepCoordinator? { get set }
 }
-
-@available(*, deprecated, renamed: "FlowStepViewController")
-public typealias SubtaskViewController = FlowStepViewController
-
-public extension FlowStepViewController {
-    @available(*, deprecated, renamed: "flowStep")
-    var subtask: FlowStep { flowStep }
-    
-    @available(*, deprecated, renamed: "flowStepCoordinator")
-    var subtaskCoordinator: FlowStepCoordinator? {
-        get { flowStepCoordinator }
-        set { flowStepCoordinator = newValue }
-    }
-}

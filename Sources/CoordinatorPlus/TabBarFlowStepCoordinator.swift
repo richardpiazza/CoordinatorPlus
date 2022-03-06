@@ -95,7 +95,4 @@ public extension TabBarFlowStepCoordinator {
         
     }
 }
-
-@available(*, deprecated, renamed: "TabBarFlowStepCoordinator")
-public typealias TabBarSubtaskCoordinator = TabBarFlowStepCoordinator
 #endif

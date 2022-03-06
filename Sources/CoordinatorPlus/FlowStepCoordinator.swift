@@ -49,24 +49,3 @@ public protocol FlowStepCoordinator: FlowCoordinator {
     ///   - animated: Indicates wether animation is to be performed.
     func endFlowStep(_ flowStep: FlowStep, animated: Bool)
 }
-
-@available(*, deprecated, renamed: "FlowStepCoordinator")
-public typealias SubtaskCoordinator = FlowStepCoordinator
-
-public extension FlowStepCoordinator {
-    @available(*, deprecated, renamed: "currentFlowStep")
-    var currentSubtask: FlowStep {
-        get { currentFlowStep }
-        set { currentFlowStep = newValue }
-    }
-    
-    @available(*, deprecated, renamed: "beginFlowStep(_:animated:with:)")
-    func beginSubtask(_ subtask: FlowStep, animated: Bool, with data: Any?) {
-        beginFlowStep(subtask, animated: animated, with: data)
-    }
-    
-    @available(*, deprecated, renamed: "endFlowStep(_:animated:)")
-    func endSubtask(_ subtask: FlowStep, animated: Bool) {
-        endFlowStep(subtask, animated: animated)
-    }
-}

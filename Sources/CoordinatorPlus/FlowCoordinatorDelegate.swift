@@ -41,23 +41,3 @@ public extension FlowCoordinatorDelegate where Self: AppCoordinator {
         beginFlow(flow, with: data)
     }
 }
-
-@available(*, deprecated, renamed: "FlowCoordinatorDelegate")
-public typealias TaskCoordinatorDelegate = FlowCoordinatorDelegate
-
-public extension FlowCoordinatorDelegate {
-    @available(*, deprecated, renamed: "flowCoordinator(_:ended:)")
-    func taskCoordinator(_ taskCoordinator: FlowCoordinator, ended task: Flow) {
-        flowCoordinator(taskCoordinator, ended: task)
-    }
-    
-    @available(*, deprecated, renamed: "flowCoordinator(_:canceled:)")
-    func taskCoordinator(_ taskCoordinator: FlowCoordinator, canceled task: Flow) {
-        flowCoordinator(taskCoordinator, canceled: task)
-    }
-    
-    @available(*, deprecated, renamed: "flowCoordinator(_:begin:with:)")
-    func taskCoordinator(_ taskCoordinator: FlowCoordinator, begin task: Flow, with data: Any?) {
-        flowCoordinator(taskCoordinator, begin: task, with: data)
-    }
-}

@@ -71,22 +71,3 @@ public extension FlowCoordinator {
         return nil
     }
 }
-
-@available(*, deprecated, renamed: "FlowCoordinator")
-public typealias TaskCoordinator = FlowCoordinator
-
-public extension FlowCoordinator {
-    #if canImport(UIKit)
-    @available(*, deprecated, renamed: "flowViewController")
-    var taskViewController: UIViewController { flowViewController }
-    #endif
-    
-    @available(*, deprecated, renamed: "flow")
-    var task: Flow { flow }
-    
-    @available(*, deprecated, renamed: "flowCoordinatorDelegate")
-    var taskCoordinatorDelegate: FlowCoordinatorDelegate? {
-        get { flowCoordinatorDelegate }
-        set { flowCoordinatorDelegate = newValue }
-    }
-}
